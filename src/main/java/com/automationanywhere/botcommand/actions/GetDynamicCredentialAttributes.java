@@ -133,41 +133,45 @@ public class GetDynamicCredentialAttributes {
             @NotEmpty
             @CredentialAllowPassword SecureString specificCRURL
 
-    ) throws Exception {
-        if (credentialName == null || credentialName.isEmpty())
-            throw new BotCommandException("Credential name is empty");
+    ) {
+        try {
+            if (credentialName == null || credentialName.isEmpty())
+                throw new BotCommandException("Credential name is empty");
 
-        if (CRType.equalsIgnoreCase("specific") && specificCRURL == null)
-            throw new BotCommandException("Control Room URL is required for specific control room");
-        String CRURL;
-        String TOKEN;
+            String CRURL;
+            String TOKEN;
 
-        switch (authType) {
-            case "user":
-                CRURL = this.globalSessionContext.getCrUrl();
-                TOKEN = this.globalSessionContext.getUserToken();
-                break;
-            case "authenticate":
-                CRURL = getCRURL(specificCRURL, CRType);
-                switch (authMethod) {
-                    case "password":
-                        TOKEN = CRRequests
-                                .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                .getToken();
-                        break;
-                    case "apikey":
-                        TOKEN = CRRequests
-                                .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                .getToken();
-                        break;
-                    default:
-                        throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
-                }
-                break;
-            default:
-                throw new BotCommandException(MESSAGES.getString("invalidAuthType", authType));
+            switch (authType) {
+                case "user":
+                    CRURL = this.globalSessionContext.getCrUrl();
+                    TOKEN = this.globalSessionContext.getUserToken();
+                    break;
+                case "authenticate":
+                    CRURL = getCRURL(specificCRURL, CRType);
+                    switch (authMethod) {
+                        case "password":
+                            TOKEN = CRRequests
+                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
+                                    .getToken();
+                            break;
+                        case "apikey":
+                            TOKEN = CRRequests
+                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
+                                    .getToken();
+                            break;
+                        default:
+                            throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
+                    }
+                    break;
+                default:
+                    throw new BotCommandException(MESSAGES.getString("invalidAuthType", authType));
+            }
+
+            return fetchCredentialAttributes(credentialName, CRURL, TOKEN);
+        } catch (Exception e) {
+            // required to provide proper error message on UI
+            throw new BotCommandException(e.toString());
         }
 
-        return fetchCredentialAttributes(credentialName, CRURL, TOKEN);
     }
 }

@@ -100,39 +100,41 @@ public class GetToken {
             @Pkg(label = "[[GetToken.specificCR.label]]", default_value_type = DataType.CREDENTIAL)
             @NotEmpty
             @CredentialAllowPassword SecureString specificCRURL) {
+        try {
+            String CRURL;
+            String TOKEN;
 
-        if (CRType.equalsIgnoreCase("specific") && specificCRURL == null)
-            throw new BotCommandException("Control Room URL is required for specific control room");
+            switch (authType) {
+                case "user":
+                    TOKEN = this.globalSessionContext.getUserToken();
+                    break;
+                case "authenticate":
+                    CRURL = getCRURL(specificCRURL, CRType);
+                    switch (authMethod) {
+                        case "password":
+                            TOKEN = CRRequests
+                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
+                                    .getToken();
+                            break;
+                        case "apikey":
+                            TOKEN = CRRequests
+                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
+                                    .getToken();
+                            break;
+                        default:
+                            throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", "authMethod"));
+                    }
+                    break;
+                default:
+                    throw new BotCommandException(MESSAGES.getString("invalidAuthType", "authType"));
+            }
 
-        String CRURL;
-        String TOKEN;
-
-        switch (authType) {
-            case "user":
-                TOKEN = this.globalSessionContext.getUserToken();
-                break;
-            case "authenticate":
-                CRURL = getCRURL(specificCRURL, CRType);
-                switch (authMethod) {
-                    case "password":
-                        TOKEN = CRRequests
-                                .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                .getToken();
-                        break;
-                    case "apikey":
-                        TOKEN = CRRequests
-                                .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                .getToken();
-                        break;
-                    default:
-                        throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", "authMethod"));
-                }
-                break;
-            default:
-                throw new BotCommandException(MESSAGES.getString("invalidAuthType", "authType"));
+            return new StringValue(TOKEN);
+        } catch (Exception e) {
+            // required to provide proper error message on UI
+            throw new BotCommandException(e.toString());
         }
 
-        return new StringValue(TOKEN);
 
     }
 }

@@ -34,6 +34,7 @@ public class GetDynamicCredentialTest {
         assertNotNull(credentialObject);
         String credentialValue = credentialObject.get().getInsecureString();
         assertNotNull(credentialValue);
+        System.out.println(credentialValue);
     }
 
 }

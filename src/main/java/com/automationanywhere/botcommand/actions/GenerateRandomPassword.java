@@ -82,38 +82,42 @@ public class GenerateRandomPassword {
             @GreaterThan("0")
             Double numSpecial
     ) {
-        if (specialCharactersFlag.equals("exclude")) {
-            numSpecial = 0.0d;
-            allowedSpecialCharacters = "";
+        try {
+            if (specialCharactersFlag.equals("exclude")) {
+                numSpecial = 0.0d;
+                allowedSpecialCharacters = "";
+            }
+
+            if (length == null || length.intValue() <= 0)
+                throw new BotCommandException(MESSAGES.getString("lengthNegative"));
+            if (numLower == null || numLower.intValue() < 0)
+                throw new BotCommandException(MESSAGES.getString("numLowerNegative"));
+            if (numUpper == null || numUpper.intValue() < 0)
+                throw new BotCommandException(MESSAGES.getString("numUpperNegative"));
+            if (numDigits == null || numDigits.intValue() < 0)
+                throw new BotCommandException(MESSAGES.getString("numDigitsNegative"));
+            if (numSpecial == null || numSpecial.intValue() < 0)
+                throw new BotCommandException(MESSAGES.getString("numSpecialNegative"));
+
+            int minimumCharactersLength = (int) (numLower + numUpper + numDigits + numSpecial);
+
+            if (length.intValue() < minimumCharactersLength)
+                throw new BotCommandException(MESSAGES.getString("lengthTooShort"));
+
+            if (specialCharactersFlag.equals("include") && allowedSpecialCharacters.isEmpty())
+                throw new BotCommandException(MESSAGES.getString("specialCharactersEmpty"));
+
+            String randomPassword = RandomPasswordGenerator.generateRandomPassword(
+                    length.intValue(),
+                    numLower.intValue(),
+                    numUpper.intValue(),
+                    numDigits.intValue(),
+                    numSpecial.intValue(),
+                    allowedSpecialCharacters);
+            return new CredentialObject(randomPassword);
+        } catch (Exception e) {
+            // required to provide proper error message on UI
+            throw new BotCommandException(e.toString());
         }
-
-        if (length == null || length.intValue() <= 0)
-            throw new BotCommandException(MESSAGES.getString("lengthNegative"));
-        if (numLower == null || numLower.intValue() < 0)
-            throw new BotCommandException(MESSAGES.getString("numLowerNegative"));
-        if (numUpper == null || numUpper.intValue() < 0)
-            throw new BotCommandException(MESSAGES.getString("numUpperNegative"));
-        if (numDigits == null || numDigits.intValue() < 0)
-            throw new BotCommandException(MESSAGES.getString("numDigitsNegative"));
-        if (numSpecial == null || numSpecial.intValue() < 0)
-            throw new BotCommandException(MESSAGES.getString("numSpecialNegative"));
-
-        int minimumCharactersLength = (int) (numLower + numUpper + numDigits + numSpecial);
-
-        if (length.intValue() < minimumCharactersLength)
-            throw new BotCommandException(MESSAGES.getString("lengthTooShort"));
-
-        if (specialCharactersFlag.equals("include") && allowedSpecialCharacters.isEmpty())
-            throw new BotCommandException(MESSAGES.getString("specialCharactersEmpty"));
-
-        String randomPassword = RandomPasswordGenerator.generateRandomPassword(
-                length.intValue(),
-                numLower.intValue(),
-                numUpper.intValue(),
-                numDigits.intValue(),
-                numSpecial.intValue(),
-                allowedSpecialCharacters);
-        return new CredentialObject(randomPassword);
-
     }
 }
