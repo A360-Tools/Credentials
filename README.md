@@ -30,3 +30,7 @@ This project addresses challenges in credential automation within the Automation
 3. **List Credential Attributes**: The package provides the ability to list all available credential attributes dynamically, making your bots more versatile.
 
 4. **Update Credential Values**: With this package, you can update credential values, a functionality not possible through standard Automation Anywhere packages.
+
+5. ### Important Note for Community Edition Control Room Users
+
+- **Warning**: Please be aware that in the Community Edition Control Room, the system does not automatically set the latest version of imported packages as the default. To ensure you are using the latest and fully functional features, you must manually change the package version to the latest version in every bot.
