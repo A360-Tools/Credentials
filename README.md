@@ -19,7 +19,7 @@ You can build this project using Gradle with the following command:
 gradle clean build :shadowJar
 ```
 
-## Problem Solved
+## About
 
 This project addresses challenges in credential management within the Automation Anywhere ecosystem:
 
