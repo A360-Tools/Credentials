@@ -21,7 +21,7 @@ gradle clean build :shadowJar
 
 ## About
 
-This project addresses challenges in credential management within the Automation Anywhere ecosystem:
+This project addresses challenges in credential automation within the Automation Anywhere ecosystem:
 
 1. **Generate Secure Passwords**: It enables you to generate psuedo random credential variables following specific ruleset of desired application, ensuring the security of your credentials.
 
