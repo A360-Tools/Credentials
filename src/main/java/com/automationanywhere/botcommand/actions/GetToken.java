@@ -25,7 +25,8 @@ import java.net.URL;
 
 @BotCommand
 @CommandPkg(label = "[[GetToken.label]]", description = "[[GetToken.description]]", icon = "credential.svg", name = "GetToken",
-        return_label = "[[GetToken.return.label]]", node_label = "[[GetToken.node.label]]", return_type = DataType.STRING, return_required = true,
+        return_label = "[[GetToken.return.label]]", node_label = "[[GetToken.node.label]]", return_type = DataType.CREDENTIAL,
+        return_required = true,
         allowed_agent_targets = AllowedTarget.HEADLESS,
         documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetToken.md")
 public class GetToken {
