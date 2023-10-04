@@ -21,7 +21,7 @@ import com.automationanywhere.core.security.SecureString;
 @CommandPkg(label = "[[GetCredential.label]]", description = "[[GetCredential.description]]", icon = "credential.svg",
         name = "GetCred", return_label = "[[GetCredential.action.return_label]]",
         node_label = "[[GetCredential.action.node_label]]", return_type = DataType.STRING, return_required = true,
-        allowed_agent_targets = AllowedTarget.HEADLESS, documentation_url = "")
+        allowed_agent_targets = AllowedTarget.HEADLESS, documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetCredential.md")
 public class GetCredential {
     private static final Messages MESSAGES = MessagesFactory
             .getMessages("com.automationanywhere.botcommand.messages.messages");

@@ -33,7 +33,7 @@ import java.util.Map;
         node_label = "[[GetDynamicCredAttributes.node_label]]",
         return_label = "[[GetDynamicCredAttributes.return_label]]", return_Direct = true, return_required = true,
         allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "",
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetDynamicCredentialAttributes.md",
         return_type = DataType.DICTIONARY, return_sub_type = DataType.STRING)
 public class GetDynamicCredentialAttributes {
     private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages.messages");

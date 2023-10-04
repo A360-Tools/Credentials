@@ -31,7 +31,7 @@ import java.util.Base64;
         node_label = "[[GetDynamicCred.node_label]]",
         return_label = "[[GetDynamicCred.return_label]]", return_required = true,
         allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "",
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetDynamicCredential.md",
         return_type = DataType.CREDENTIAL)
 public class GetDynamicCredential {
     private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages.messages");

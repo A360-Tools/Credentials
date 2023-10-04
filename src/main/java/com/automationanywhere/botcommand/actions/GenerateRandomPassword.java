@@ -23,7 +23,7 @@ import com.automationanywhere.utilities.RandomPasswordGenerator;
         return_label = "[[GenerateRandomPassword.action.return_label]]",
         node_label = "[[GenerateRandomPassword.action.node_label]]", return_type = DataType.CREDENTIAL,
         return_required = true, allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "")
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GenerateRandomPassword.md")
 public class GenerateRandomPassword {
     private static final Messages MESSAGES = MessagesFactory
             .getMessages("com.automationanywhere.botcommand.messages.messages");

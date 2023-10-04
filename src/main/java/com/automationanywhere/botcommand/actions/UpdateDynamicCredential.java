@@ -29,7 +29,7 @@ import java.util.Map;
         icon = "credential.svg", name = "UpdateDynamicCred",
         node_label = "[[UpdateDynamicCred.node_label]]",
         allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "")
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/UpdateDynamicCredential.md")
 public class UpdateDynamicCredential {
     private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages.messages");
 
