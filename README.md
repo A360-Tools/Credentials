@@ -19,9 +19,12 @@ You can build this project using Gradle with the following command:
 gradle clean build :shadowJar
 ```
 
-## Problem Solved
+## Important Note for Community Edition Control Room Users
+- **Warning**: Please be aware that in the Community Edition Control Room, the system does not automatically set the latest version of imported packages as the default. To ensure you are using the latest and fully functional features, you must manually change the package version to the latest version in every bot.
 
-This project addresses challenges in credential management within the Automation Anywhere ecosystem:
+## About
+
+This project addresses challenges in credential automation within the Automation Anywhere ecosystem:
 
 1. **Generate Secure Passwords**: It enables you to generate psuedo random credential variables following specific ruleset of desired application, ensuring the security of your credentials.
 
@@ -30,3 +33,5 @@ This project addresses challenges in credential management within the Automation
 3. **List Credential Attributes**: The package provides the ability to list all available credential attributes dynamically, making your bots more versatile.
 
 4. **Update Credential Values**: With this package, you can update credential values, a functionality not possible through standard Automation Anywhere packages.
+
+
