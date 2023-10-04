@@ -5,7 +5,7 @@ package com.automationanywhere.botcommand.actions;
 
 import com.automationanywhere.bot.service.GlobalSessionContext;
 import com.automationanywhere.botcommand.data.Value;
-import com.automationanywhere.botcommand.data.impl.StringValue;
+import com.automationanywhere.botcommand.data.impl.CredentialObject;
 import com.automationanywhere.botcommand.exception.BotCommandException;
 import com.automationanywhere.commandsdk.annotations.*;
 import com.automationanywhere.commandsdk.annotations.rules.CredentialAllowPassword;
@@ -59,7 +59,7 @@ public class GetToken {
     }
 
     @Execute
-    public Value<String> action(
+    public Value<SecureString> action(
             @Idx(index = "1", type = AttributeType.SELECT, options = {
                     @Idx.Option(index = "1.1", pkg = @Pkg(label = "[[GetToken.authType.currentUser.label]]", value = "user")),
                     @Idx.Option(index = "1.2", pkg = @Pkg(label = "[[GetToken.authType.specificUser.label]]", value = "authenticate"))})
@@ -128,8 +128,7 @@ public class GetToken {
                 default:
                     throw new BotCommandException(MESSAGES.getString("invalidAuthType", "authType"));
             }
-
-            return new StringValue(TOKEN);
+            return new CredentialObject(TOKEN);
         } catch (Exception e) {
             // required to provide proper error message on UI
             throw new BotCommandException(e.toString());
