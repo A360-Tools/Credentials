@@ -2,6 +2,8 @@
 
 - **Description:** Retrieves a secure credential and returns it as a string value.
 
+![Alt text](./Screenshots/GetCredential.png)
+
 ### Parameters
 
 1. `credentials` (Type: `SecureString`)

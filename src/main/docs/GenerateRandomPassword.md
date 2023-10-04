@@ -2,6 +2,8 @@
 
 - **Description:** Generates a random password based on specified criteria.
 
+![Alt text](./Screenshots/GenerateRandomPassword.png)
+
 ### Parameters
 
 1. `length` (Type: `Number`)

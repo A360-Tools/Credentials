@@ -3,6 +3,8 @@
 - **Description:** Retrieves attributes of a credential based on the provided parameters and authentication
   settings.
 
+![Alt text](./Screenshots/GetDynamicCredentialAttributes.png)
+
 ### Parameters
 
 1. `credentialName` (Type: `String`)

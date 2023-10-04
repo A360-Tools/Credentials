@@ -2,6 +2,8 @@
 
 - **Description:** Retrieves an authentication token based on the provided parameters and authentication settings.
 
+![Alt text](./Screenshots/GetToken.png)
+
 ### Parameters
 
 1. `authType` (Type: `String`)

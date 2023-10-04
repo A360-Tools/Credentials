@@ -2,6 +2,8 @@
 
 - **Description:** Retrieves a secure credential attribute based on the provided parameters and authentication settings.
 
+![Alt text](./Screenshots/GetDynamicCredential.png)
+
 ### Parameters
 
 1. `credentialName` (Type: `String`)

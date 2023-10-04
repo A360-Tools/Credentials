@@ -3,6 +3,8 @@
 - **Description:** Updates a secure attribute value for a given credential based on the provided parameters and
   authentication settings.
 
+![Alt text](./Screenshots/UpdateDynamicCredential.png)
+
 ### Parameters
 
 1. `credentialName` (Type: `String`)
