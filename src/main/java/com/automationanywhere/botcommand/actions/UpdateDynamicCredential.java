@@ -60,8 +60,8 @@ public class UpdateDynamicCredential {
             throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
     }
 
-    private JSONObject getCredentialByName(String CRURL, String TOKEN, String credentialName) {
-        String response = new CRRequests(CRURL, TOKEN).getCredentialByName(credentialName);
+    private JSONObject getCredentialByName(CRRequests crRequestsObject, String credentialName) {
+        String response = crRequestsObject.getCredentialByName(credentialName);
         JSONObject responseJSON = new JSONObject(response);
         JSONArray list = responseJSON.getJSONArray("list");
 
@@ -82,8 +82,8 @@ public class UpdateDynamicCredential {
         throw new BotCommandException(MESSAGES.getString("invalidAttributeName", attributeName));
     }
 
-    private Map<String, String> getAttributeValueProperty(String CRURL, String TOKEN, String credentialID, String credentialAttributeId) {
-        String response = new CRRequests(CRURL, TOKEN).getAttributeValueIDByCredential(credentialID);
+    private Map<String, String> getAttributeValueProperty(CRRequests crRequestsObject, String credentialID, String credentialAttributeId) {
+        String response = crRequestsObject.getAttributeValueIDByCredential(credentialID);
         JSONObject responseJSON = new JSONObject(response);
         JSONArray list = responseJSON.getJSONArray("list");
         Map<String, String> credentialProperty = new HashMap<>();
@@ -167,24 +167,23 @@ public class UpdateDynamicCredential {
 
             String CRURL;
             String TOKEN;
-
+            CRRequests crRequestsObject;
             switch (authType) {
                 case "user":
                     CRURL = this.globalSessionContext.getCrUrl();
                     TOKEN = this.globalSessionContext.getUserToken();
+                    crRequestsObject = new CRRequests(CRURL, TOKEN);
                     break;
                 case "authenticate":
                     CRURL = getCRURL(specificCRURL, CRType);
                     switch (authMethod) {
                         case "password":
-                            TOKEN = CRRequests
-                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            crRequestsObject = CRRequests
+                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString());
                             break;
                         case "apikey":
-                            TOKEN = CRRequests
-                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            crRequestsObject = CRRequests
+                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString());
                             break;
                         default:
                             throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
@@ -194,15 +193,16 @@ public class UpdateDynamicCredential {
                     throw new BotCommandException(MESSAGES.getString("invalidAuthType", authType));
             }
 
-            JSONObject credential = getCredentialByName(CRURL, TOKEN, credentialName);
+            JSONObject credential = getCredentialByName(crRequestsObject, credentialName);
             String credentialID = credential.getString("id");
             JSONArray attributes = credential.getJSONArray("attributes");
             String credentialAttributeId = getAttributeIdByName(attributes, attributeName);
-            Map<String, String> credentialProperty = getAttributeValueProperty(CRURL, TOKEN, credentialID, credentialAttributeId);
+            Map<String, String> credentialProperty = getAttributeValueProperty(crRequestsObject, credentialID,
+                    credentialAttributeId);
             String credentialAttributeValueId = credentialProperty.get("credentialAttributeValueId");
             String credentialAttributeVersion = credentialProperty.get("version");
 
-            new CRRequests(CRURL, TOKEN)
+            crRequestsObject
                     .updateAttributeValue(credentialID, credentialAttributeValueId,
                             updatedValue.getInsecureString(), credentialAttributeVersion);
         } catch (Exception e) {

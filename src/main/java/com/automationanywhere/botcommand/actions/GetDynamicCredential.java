@@ -56,13 +56,13 @@ public class GetDynamicCredential {
         this.globalSessionContext = globalSessionContext;
     }
 
-    private CredentialObject fetchCredentialAttribute(String credentialName, String attributeName, String CRURL, String TOKEN) {
-        String UserId = getUserIdFromToken(TOKEN);
-        JSONObject credential = getCredentialByName(CRURL, TOKEN, credentialName);
+    private CredentialObject fetchCredentialAttribute(String credentialName, String attributeName, CRRequests crRequestsObject) {
+        String UserId = getUserIdFromToken(crRequestsObject.getToken());
+        JSONObject credential = getCredentialByName(crRequestsObject, credentialName);
         String credentialID = credential.getString("id");
         JSONArray attributes = credential.getJSONArray("attributes");
         String credentialAttributeId = getAttributeIdByName(attributes, attributeName);
-        String credValue = getAttributeValue(CRURL, TOKEN, credentialID, credentialAttributeId, UserId);
+        String credValue = getAttributeValue(crRequestsObject, credentialID, credentialAttributeId, UserId);
 
         return new CredentialObject(credValue);
     }
@@ -73,8 +73,8 @@ public class GetDynamicCredential {
         return payload.getString("sub");
     }
 
-    private JSONObject getCredentialByName(String CRURL, String TOKEN, String credentialName) {
-        String response = new CRRequests(CRURL, TOKEN).getCredentialByName(credentialName);
+    private JSONObject getCredentialByName(CRRequests crRequestsObject, String credentialName) {
+        String response = crRequestsObject.getCredentialByName(credentialName);
         JSONObject responseJSON = new JSONObject(response);
         JSONArray list = responseJSON.getJSONArray("list");
 
@@ -106,8 +106,8 @@ public class GetDynamicCredential {
         throw new BotCommandException(MESSAGES.getString("invalidAttributeName", attributeName));
     }
 
-    private String getAttributeValue(String CRURL, String TOKEN, String credentialID, String credentialAttributeId, String UserId) {
-        String response = new CRRequests(CRURL, TOKEN).getAttributeValue(credentialID, credentialAttributeId, UserId);
+    private String getAttributeValue(CRRequests crRequestsObject, String credentialID, String credentialAttributeId, String UserId) {
+        String response = crRequestsObject.getAttributeValue(credentialID, credentialAttributeId, UserId);
         JSONObject responseJSON = new JSONObject(response);
         JSONArray list = responseJSON.getJSONArray("list");
 
@@ -179,24 +179,23 @@ public class GetDynamicCredential {
 
             String CRURL;
             String TOKEN;
-
+            CRRequests crRequestsObject;
             switch (authType) {
                 case "user":
                     CRURL = this.globalSessionContext.getCrUrl();
                     TOKEN = this.globalSessionContext.getUserToken();
+                    crRequestsObject = new CRRequests(CRURL, TOKEN);
                     break;
                 case "authenticate":
                     CRURL = getCRURL(specificCRURL, CRType);
                     switch (authMethod) {
                         case "password":
-                            TOKEN = CRRequests
-                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            crRequestsObject = CRRequests
+                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString());
                             break;
                         case "apikey":
-                            TOKEN = CRRequests
-                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            crRequestsObject = CRRequests
+                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString());
                             break;
                         default:
                             throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
@@ -206,7 +205,7 @@ public class GetDynamicCredential {
                     throw new BotCommandException(MESSAGES.getString("invalidAuthType", authType));
             }
 
-            return fetchCredentialAttribute(credentialName, attributeName, CRURL, TOKEN);
+            return fetchCredentialAttribute(credentialName, attributeName, crRequestsObject);
         } catch (Exception e) {
             // required to provide proper error message on UI
             throw new BotCommandException(e.toString());
