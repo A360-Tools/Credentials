@@ -27,11 +27,15 @@ gradle clean build :shadowJar
 This project addresses challenges in credential automation within the Automation Anywhere ecosystem:
 
 1. **Generate Secure Passwords**: It enables you to generate psuedo random credential variables following specific ruleset of desired application, ensuring the security of your credentials.
+</br> ![Alt text](./src/main/docs/Screenshots/GenerateRandomPassword.png)
 
 2. **Dynamic Credential Retrieval**: You can retrieve credentials at runtime, allowing you to decide which credential and attribute to use during bot execution, rather than selecting them during development.
+</br> ![Alt text](./src/main/docs/Screenshots/GetDynamicCredential.png)
 
 3. **List Credential Attributes**: The package provides the ability to list all available credential attributes dynamically, making your bots more versatile.
+</br> ![Alt text](./src/main/docs/Screenshots/GetDynamicCredentialAttributes.png)
 
 4. **Update Credential Values**: With this package, you can update credential values, a functionality not possible through standard Automation Anywhere packages.
+</br> ![Alt text](./src/main/docs/Screenshots/UpdateDynamicCredential.png)
 
 
