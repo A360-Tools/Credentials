@@ -1,5 +1,5 @@
 ## Get Credential Attributes
-
+## Required: Either credential owner or "View and edit ALL credentials attributes value" permission role
 - **Description:** Retrieves attributes of a credential based on the provided parameters and authentication
   settings.
 
