@@ -1,4 +1,5 @@
 ### Update Credential
+## Required: Either credential owner or "View and edit ALL credentials attributes value" permission role
 
 - **Description:** Updates a secure attribute value for a given credential based on the provided parameters and
   authentication settings.
