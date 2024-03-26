@@ -1,4 +1,4 @@
-# Get Credential
+# Get Dynamic Credential
 
 ## Required: Either credential owner or "View and edit ALL credentials attributes value" permission role
 
