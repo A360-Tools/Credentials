@@ -13,7 +13,8 @@ public class UpdateDynamicCredentialTest {
     private final String authMethod = "password";  // password or apikey
     private final SecureString authDetails = new CredentialObject("mypass").get();
     private final String CRType = "specific";// current or specific
-    private final SecureString specificCRURL = new CredentialObject("https://community.cloud.automationanywhere.digital/").get();// Use if CRType is specific
+    private final SecureString specificCRURL = new CredentialObject("https://community.cloud.automationanywhere" +
+            ".digital/").get();// Use if CRType is specific
     private UpdateDynamicCredential credentialUpdater;
 
     @BeforeClass
@@ -27,7 +28,8 @@ public class UpdateDynamicCredentialTest {
         String attributeName = "username";
         SecureString newValue = new CredentialObject("mynewuser1").get();
         credentialUpdater.execute(
-                credentialName, attributeName, authType, username, authMethod, authDetails, CRType, specificCRURL, newValue, "");
+                credentialName, attributeName, authType, username, authMethod, authDetails, CRType, specificCRURL,
+                newValue, "");
     }
 
 }

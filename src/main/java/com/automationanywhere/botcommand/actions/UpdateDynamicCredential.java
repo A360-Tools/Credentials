@@ -11,7 +11,6 @@ import com.automationanywhere.commandsdk.annotations.rules.NotEmpty;
 import com.automationanywhere.commandsdk.annotations.rules.SelectModes;
 import com.automationanywhere.commandsdk.i18n.Messages;
 import com.automationanywhere.commandsdk.i18n.MessagesFactory;
-import com.automationanywhere.commandsdk.model.AllowedTarget;
 import com.automationanywhere.commandsdk.model.AttributeType;
 import com.automationanywhere.commandsdk.model.DataType;
 import com.automationanywhere.core.security.SecureString;
@@ -28,76 +27,18 @@ import java.util.Map;
 @CommandPkg(label = "[[UpdateDynamicCred.label]]", description = "[[UpdateDynamicCred.description]]",
         icon = "credential.svg", name = "UpdateDynamicCred",
         node_label = "[[UpdateDynamicCred.node_label]]",
-        allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/UpdateDynamicCredential.md")
+//        allowed_agent_targets = AllowedTarget.HEADLESS,
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs" +
+                "/UpdateDynamicCredential.md")
 public class UpdateDynamicCredential {
-    private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages.messages");
+    private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages" +
+            ".messages");
 
     @com.automationanywhere.commandsdk.annotations.GlobalSessionContext
     private GlobalSessionContext globalSessionContext;
 
-    public static boolean isValidURL(String urlString) {
-        try {
-            new URL(urlString);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
-    }
-
     public void setGlobalSessionContext(GlobalSessionContext globalSessionContext) {
         this.globalSessionContext = globalSessionContext;
-    }
-
-    private String getCRURL(SecureString URL, String CRType) {
-        if (CRType.equalsIgnoreCase("current"))
-            return this.globalSessionContext.getCrUrl();
-
-        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
-        if (isValidURL(expectedURLformat))
-            return expectedURLformat;
-        else
-            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
-    }
-
-    private JSONObject getCredentialByName(CRRequests crRequestsObject, String credentialName) {
-        String response = crRequestsObject.getCredentialByName(credentialName);
-        JSONObject responseJSON = new JSONObject(response);
-        JSONArray list = responseJSON.getJSONArray("list");
-
-        if (list.isEmpty()) {
-            throw new BotCommandException(MESSAGES.getString("invalidCredentialName", credentialName));
-        }
-
-        return list.getJSONObject(0);
-    }
-
-    private String getAttributeIdByName(JSONArray attributes, String attributeName) {
-        for (int i = 0; i < attributes.length(); i++) {
-            JSONObject currentAttribute = attributes.getJSONObject(i);
-            if (currentAttribute.getString("name").equals(attributeName)) {
-                return currentAttribute.getString("id");
-            }
-        }
-        throw new BotCommandException(MESSAGES.getString("invalidAttributeName", attributeName));
-    }
-
-    private Map<String, String> getAttributeValueProperty(CRRequests crRequestsObject, String credentialID, String credentialAttributeId) {
-        String response = crRequestsObject.getAttributeValueIDByCredential(credentialID);
-        JSONObject responseJSON = new JSONObject(response);
-        JSONArray list = responseJSON.getJSONArray("list");
-        Map<String, String> credentialProperty = new HashMap<>();
-        for (int i = 0; i < list.length(); i++) {
-            JSONObject currentAttribute = list.getJSONObject(i);
-
-            if (currentAttribute.getString("credentialAttributeId").equals(credentialAttributeId)) {
-                credentialProperty.put("credentialAttributeValueId", currentAttribute.getString("id"));
-                credentialProperty.put("version", currentAttribute.getString("version"));
-                return credentialProperty;
-            }
-        }
-
-        throw new BotCommandException(MESSAGES.getString("invalidAttributeValue"));
     }
 
     @Execute
@@ -113,9 +54,12 @@ public class UpdateDynamicCredential {
             @NotEmpty String attributeName,
 
             @Idx(index = "3", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.1", pkg = @Pkg(label = "[[UpdateDynamicCred.authType.currentUser.label]]", value = "user")),
-                    @Idx.Option(index = "3.2", pkg = @Pkg(label = "[[UpdateDynamicCred.authType.specificUser.label]]", value = "authenticate"))})
-            @Pkg(label = "[[UpdateDynamicCred.authType.label]]", description = "[[UpdateDynamicCred.authType.description]]",
+                    @Idx.Option(index = "3.1", pkg = @Pkg(label = "[[UpdateDynamicCred.authType.currentUser.label]]",
+                            value = "user")),
+                    @Idx.Option(index = "3.2", pkg = @Pkg(label = "[[UpdateDynamicCred.authType.specificUser.label]]"
+                            , value = "authenticate"))})
+            @Pkg(label = "[[UpdateDynamicCred.authType.label]]", description = "[[UpdateDynamicCred.authType" +
+                    ".description]]",
                     default_value = "user", default_value_type = DataType.STRING)
             @NotEmpty
             @SelectModes String authType,
@@ -126,9 +70,12 @@ public class UpdateDynamicCredential {
             @CredentialAllowPassword SecureString username,
 
             @Idx(index = "3.2.2", type = AttributeType.RADIO, options = {
-                    @Idx.Option(index = "3.2.2.1", pkg = @Pkg(label = "[[UpdateDynamicCred.authMethod.password.label]]", value = "password")),
-                    @Idx.Option(index = "3.2.2.2", pkg = @Pkg(label = "[[UpdateDynamicCred.authMethod.apiKey.label]]", value = "apikey"))})
-            @Pkg(label = "[[UpdateDynamicCred.authMethod.label]]", default_value = "password", default_value_type = DataType.STRING)
+                    @Idx.Option(index = "3.2.2.1", pkg = @Pkg(label = "[[UpdateDynamicCred.authMethod.password" +
+                            ".label]]", value = "password")),
+                    @Idx.Option(index = "3.2.2.2", pkg = @Pkg(label = "[[UpdateDynamicCred.authMethod.apiKey.label]]"
+                            , value = "apikey"))})
+            @Pkg(label = "[[UpdateDynamicCred.authMethod.label]]", default_value = "password", default_value_type =
+                    DataType.STRING)
             @NotEmpty String authMethod,
 
             @Idx(index = "3.2.3", type = AttributeType.CREDENTIAL)
@@ -137,9 +84,12 @@ public class UpdateDynamicCredential {
             @CredentialAllowPassword SecureString authDetails,
 
             @Idx(index = "3.2.4", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.2.4.1", pkg = @Pkg(label = "[[UpdateDynamicCred.CRType.currentCR.label]]", value = "current")),
-                    @Idx.Option(index = "3.2.4.2", pkg = @Pkg(label = "[[UpdateDynamicCred.CRType.specificCR.label]]", value = "specific"))})
-            @Pkg(label = "[[UpdateDynamicCred.CRType.label]]", default_value = "current", default_value_type = DataType.STRING)
+                    @Idx.Option(index = "3.2.4.1", pkg = @Pkg(label = "[[UpdateDynamicCred.CRType.currentCR.label]]",
+                            value = "current")),
+                    @Idx.Option(index = "3.2.4.2", pkg = @Pkg(label = "[[UpdateDynamicCred.CRType.specificCR.label]]"
+                            , value = "specific"))})
+            @Pkg(label = "[[UpdateDynamicCred.CRType.label]]", default_value = "current", default_value_type =
+                    DataType.STRING)
             @NotEmpty
             @SelectModes String CRType,
 
@@ -160,10 +110,12 @@ public class UpdateDynamicCredential {
 
     ) {
         try {
-            if (credentialName == null || credentialName.isEmpty())
+            if (credentialName == null || credentialName.isEmpty()) {
                 throw new BotCommandException("Credential name is empty");
-            if (attributeName == null || attributeName.isEmpty())
+            }
+            if (attributeName == null || attributeName.isEmpty()) {
                 throw new BotCommandException("Attribute name is empty");
+            }
 
             String CRURL;
             String TOKEN;
@@ -210,5 +162,68 @@ public class UpdateDynamicCredential {
             throw new BotCommandException(e.toString());
         }
 
+    }
+
+    private String getCRURL(SecureString URL, String CRType) {
+        if (CRType.equalsIgnoreCase("current")) {
+            return this.globalSessionContext.getCrUrl();
+        }
+
+        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
+        if (isValidURL(expectedURLformat)) {
+            return expectedURLformat;
+        } else {
+            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
+        }
+    }
+
+    private JSONObject getCredentialByName(CRRequests crRequestsObject, String credentialName) {
+        String response = crRequestsObject.getCredentialByName(credentialName);
+        JSONObject responseJSON = new JSONObject(response);
+        JSONArray list = responseJSON.getJSONArray("list");
+
+        if (list.isEmpty()) {
+            throw new BotCommandException(MESSAGES.getString("invalidCredentialName", credentialName));
+        }
+
+        return list.getJSONObject(0);
+    }
+
+    private String getAttributeIdByName(JSONArray attributes, String attributeName) {
+        for (int i = 0; i < attributes.length(); i++) {
+            JSONObject currentAttribute = attributes.getJSONObject(i);
+            if (currentAttribute.getString("name").equals(attributeName)) {
+                return currentAttribute.getString("id");
+            }
+        }
+        throw new BotCommandException(MESSAGES.getString("invalidAttributeName", attributeName));
+    }
+
+    private Map<String, String> getAttributeValueProperty(CRRequests crRequestsObject, String credentialID,
+                                                          String credentialAttributeId) {
+        String response = crRequestsObject.getAttributeValueIDByCredential(credentialID);
+        JSONObject responseJSON = new JSONObject(response);
+        JSONArray list = responseJSON.getJSONArray("list");
+        Map<String, String> credentialProperty = new HashMap<>();
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject currentAttribute = list.getJSONObject(i);
+
+            if (currentAttribute.getString("credentialAttributeId").equals(credentialAttributeId)) {
+                credentialProperty.put("credentialAttributeValueId", currentAttribute.getString("id"));
+                credentialProperty.put("version", currentAttribute.getString("version"));
+                return credentialProperty;
+            }
+        }
+
+        throw new BotCommandException(MESSAGES.getString("invalidAttributeValue"));
+    }
+
+    public static boolean isValidURL(String urlString) {
+        try {
+            new URL(urlString);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }

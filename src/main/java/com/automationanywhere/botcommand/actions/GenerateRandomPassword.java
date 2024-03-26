@@ -10,7 +10,6 @@ import com.automationanywhere.commandsdk.annotations.*;
 import com.automationanywhere.commandsdk.annotations.rules.*;
 import com.automationanywhere.commandsdk.i18n.Messages;
 import com.automationanywhere.commandsdk.i18n.MessagesFactory;
-import com.automationanywhere.commandsdk.model.AllowedTarget;
 import com.automationanywhere.commandsdk.model.AttributeType;
 import com.automationanywhere.commandsdk.model.DataType;
 import com.automationanywhere.core.security.SecureString;
@@ -22,8 +21,10 @@ import com.automationanywhere.utilities.RandomPasswordGenerator;
         icon = "credential.svg", name = "GenRandomPassword",
         return_label = "[[GenerateRandomPassword.action.return_label]]",
         node_label = "[[GenerateRandomPassword.action.node_label]]", return_type = DataType.CREDENTIAL,
-        return_required = true, allowed_agent_targets = AllowedTarget.HEADLESS,
-        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GenerateRandomPassword.md")
+        return_required = true,
+//        allowed_agent_targets = AllowedTarget.HEADLESS,
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GenerateRandomPassword" +
+                ".md")
 public class GenerateRandomPassword {
     private static final Messages MESSAGES = MessagesFactory
             .getMessages("com.automationanywhere.botcommand.messages.messages");
@@ -38,29 +39,34 @@ public class GenerateRandomPassword {
             Double length,
 
             @Idx(index = "2", type = AttributeType.NUMBER) @Pkg(label = "[[GenerateRandomPassword.numLower.label]]",
-                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numLower.description]]")
+                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numLower" +
+                    ".description]]")
             @NotEmpty
             @NumberInteger
             @GreaterThanEqualTo("0")
             Double numLower,
 
             @Idx(index = "3", type = AttributeType.NUMBER) @Pkg(label = "[[GenerateRandomPassword.numUpper.label]]",
-                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numUpper.description]]")
+                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numUpper" +
+                    ".description]]")
             @NotEmpty
             @NumberInteger
             @GreaterThanEqualTo("0")
             Double numUpper,
 
             @Idx(index = "4", type = AttributeType.NUMBER) @Pkg(label = "[[GenerateRandomPassword.numDigits.label]]",
-                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numDigits.description]]")
+                    default_value_type = DataType.NUMBER, description = "[[GenerateRandomPassword.numDigits" +
+                    ".description]]")
             @NotEmpty
             @NumberInteger
             @GreaterThan("0")
             Double numDigits,
 
             @Idx(index = "5", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "5.1", pkg = @Pkg(label = "[[GenerateRandomPassword.Include.label]]", value = "include")),
-                    @Idx.Option(index = "5.2", pkg = @Pkg(label = "[[GenerateRandomPassword.Exclude.label]]", value = "exclude"))})
+                    @Idx.Option(index = "5.1", pkg = @Pkg(label = "[[GenerateRandomPassword.Include.label]]", value =
+                            "include")),
+                    @Idx.Option(index = "5.2", pkg = @Pkg(label = "[[GenerateRandomPassword.Exclude.label]]", value =
+                            "exclude"))})
             @Pkg(label = "[[GenerateRandomPassword.specialCharactersFlag.label]]",
                     description = "[[GenerateRandomPassword.specialCharactersFlag.description]]",
                     default_value = "include", default_value_type = DataType.STRING)
@@ -74,7 +80,8 @@ public class GenerateRandomPassword {
             @NotEmpty
             String allowedSpecialCharacters,
 
-            @Idx(index = "5.1.2", type = AttributeType.NUMBER) @Pkg(label = "[[GenerateRandomPassword.numSpecial.label]]",
+            @Idx(index = "5.1.2", type = AttributeType.NUMBER) @Pkg(label = "[[GenerateRandomPassword.numSpecial" +
+                    ".label]]",
                     default_value_type = DataType.NUMBER,
                     description = "[[GenerateRandomPassword.numSpecial.description]]")
             @NotEmpty
@@ -88,24 +95,31 @@ public class GenerateRandomPassword {
                 allowedSpecialCharacters = "";
             }
 
-            if (length == null || length.intValue() <= 0)
+            if (length == null || length.intValue() <= 0) {
                 throw new BotCommandException(MESSAGES.getString("lengthNegative"));
-            if (numLower == null || numLower.intValue() < 0)
+            }
+            if (numLower == null || numLower.intValue() < 0) {
                 throw new BotCommandException(MESSAGES.getString("numLowerNegative"));
-            if (numUpper == null || numUpper.intValue() < 0)
+            }
+            if (numUpper == null || numUpper.intValue() < 0) {
                 throw new BotCommandException(MESSAGES.getString("numUpperNegative"));
-            if (numDigits == null || numDigits.intValue() < 0)
+            }
+            if (numDigits == null || numDigits.intValue() < 0) {
                 throw new BotCommandException(MESSAGES.getString("numDigitsNegative"));
-            if (numSpecial == null || numSpecial.intValue() < 0)
+            }
+            if (numSpecial == null || numSpecial.intValue() < 0) {
                 throw new BotCommandException(MESSAGES.getString("numSpecialNegative"));
+            }
 
             int minimumCharactersLength = (int) (numLower + numUpper + numDigits + numSpecial);
 
-            if (length.intValue() < minimumCharactersLength)
+            if (length.intValue() < minimumCharactersLength) {
                 throw new BotCommandException(MESSAGES.getString("lengthTooShort"));
+            }
 
-            if (specialCharactersFlag.equals("include") && allowedSpecialCharacters.isEmpty())
+            if (specialCharactersFlag.equals("include") && allowedSpecialCharacters.isEmpty()) {
                 throw new BotCommandException(MESSAGES.getString("specialCharactersEmpty"));
+            }
 
             String randomPassword = RandomPasswordGenerator.generateRandomPassword(
                     length.intValue(),

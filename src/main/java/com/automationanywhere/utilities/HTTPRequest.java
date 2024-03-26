@@ -39,7 +39,8 @@ public final class HTTPRequest {
         }
     }
 
-    private static HttpRequestBase createRequest(String url, Map<String, String> headers, String body, HttpMethod method) {
+    private static HttpRequestBase createRequest(String url, Map<String, String> headers, String body,
+                                                 HttpMethod method) {
         HttpRequestBase request = getHttpRequestBase(url, headers, method);
 
         if (body != null && !body.isEmpty()) {
@@ -52,6 +53,13 @@ public final class HTTPRequest {
         }
 
         return request;
+    }
+
+    private static void handleErrorResponse(CloseableHttpResponse response) throws IOException {
+        HttpEntity entity = response.getEntity();
+        String errorDetails = entity != null ? EntityUtils.toString(entity) : "";
+        throw new BotCommandException("Could not complete the action. Error code: " +
+                response.getStatusLine().getStatusCode() + " Error details: " + errorDetails);
     }
 
     @NotNull
@@ -79,12 +87,5 @@ public final class HTTPRequest {
             request.setHeader(header.getKey(), header.getValue());
         }
         return request;
-    }
-
-    private static void handleErrorResponse(CloseableHttpResponse response) throws IOException {
-        HttpEntity entity = response.getEntity();
-        String errorDetails = entity != null ? EntityUtils.toString(entity) : "";
-        throw new BotCommandException("Could not complete the action. Error code: " +
-                response.getStatusLine().getStatusCode() + " Error details: " + errorDetails);
     }
 }

@@ -19,25 +19,25 @@ public final class RandomPasswordGenerator {
         ruleSize += numDigits > 0 ? 1 : 0;
         ruleSize += numSpecial > 0 ? 1 : 0;
 
-        CharacterRule[] ruleArr = new CharacterRule[ruleSize];
+        CharacterRule[] ruleArr = new CharacterRule[ ruleSize ];
         int currentIndex = 0;
 
         if (numLower > 0) {
             CharacterRule lowerCaseRule = new CharacterRule(EnglishCharacterData.LowerCase);
             lowerCaseRule.setNumberOfCharacters(numLower);
-            ruleArr[currentIndex++] = lowerCaseRule;
+            ruleArr[ currentIndex++ ] = lowerCaseRule;
         }
 
         if (numUpper > 0) {
             CharacterRule upperCaseRule = new CharacterRule(EnglishCharacterData.UpperCase);
             upperCaseRule.setNumberOfCharacters(numUpper);
-            ruleArr[currentIndex++] = upperCaseRule;
+            ruleArr[ currentIndex++ ] = upperCaseRule;
         }
 
         if (numDigits > 0) {
             CharacterRule digitRule = new CharacterRule(EnglishCharacterData.Digit);
             digitRule.setNumberOfCharacters(numDigits);
-            ruleArr[currentIndex++] = digitRule;
+            ruleArr[ currentIndex++ ] = digitRule;
         }
 
         if (numSpecial > 0) {
@@ -52,7 +52,7 @@ public final class RandomPasswordGenerator {
             };
             CharacterRule splCharRule = new CharacterRule(specialChars);
             splCharRule.setNumberOfCharacters(numSpecial);
-            ruleArr[currentIndex] = splCharRule;
+            ruleArr[ currentIndex ] = splCharRule;
         }
 
         return gen.generatePassword(length, ruleArr);

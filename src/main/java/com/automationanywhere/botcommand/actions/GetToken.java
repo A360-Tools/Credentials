@@ -13,7 +13,6 @@ import com.automationanywhere.commandsdk.annotations.rules.NotEmpty;
 import com.automationanywhere.commandsdk.annotations.rules.SelectModes;
 import com.automationanywhere.commandsdk.i18n.Messages;
 import com.automationanywhere.commandsdk.i18n.MessagesFactory;
-import com.automationanywhere.commandsdk.model.AllowedTarget;
 import com.automationanywhere.commandsdk.model.AttributeType;
 import com.automationanywhere.commandsdk.model.DataType;
 import com.automationanywhere.core.security.SecureString;
@@ -24,10 +23,12 @@ import java.net.URL;
 
 
 @BotCommand
-@CommandPkg(label = "[[GetToken.label]]", description = "[[GetToken.description]]", icon = "credential.svg", name = "GetToken",
-        return_label = "[[GetToken.return.label]]", node_label = "[[GetToken.node.label]]", return_type = DataType.CREDENTIAL,
+@CommandPkg(label = "[[GetToken.label]]", description = "[[GetToken.description]]", icon = "credential.svg", name =
+        "GetToken",
+        return_label = "[[GetToken.return.label]]", node_label = "[[GetToken.node.label]]", return_type =
+        DataType.CREDENTIAL,
         return_required = true,
-        allowed_agent_targets = AllowedTarget.HEADLESS,
+//        allowed_agent_targets = AllowedTarget.HEADLESS,
         documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetToken.md")
 public class GetToken {
     private static final Messages MESSAGES = MessagesFactory
@@ -35,35 +36,17 @@ public class GetToken {
     @com.automationanywhere.commandsdk.annotations.GlobalSessionContext
     private GlobalSessionContext globalSessionContext;
 
-    public static boolean isValidURL(String urlString) {
-        try {
-            new URL(urlString);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
-    }
-
     public void setGlobalSessionContext(GlobalSessionContext globalSessionContext) {
         this.globalSessionContext = globalSessionContext;
-    }
-
-    private String getCRURL(SecureString URL, String CRType) {
-        if (CRType.equalsIgnoreCase("current"))
-            return this.globalSessionContext.getCrUrl();
-
-        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
-        if (isValidURL(expectedURLformat))
-            return expectedURLformat;
-        else
-            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
     }
 
     @Execute
     public Value<SecureString> action(
             @Idx(index = "1", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "1.1", pkg = @Pkg(label = "[[GetToken.authType.currentUser.label]]", value = "user")),
-                    @Idx.Option(index = "1.2", pkg = @Pkg(label = "[[GetToken.authType.specificUser.label]]", value = "authenticate"))})
+                    @Idx.Option(index = "1.1", pkg = @Pkg(label = "[[GetToken.authType.currentUser.label]]", value =
+                            "user")),
+                    @Idx.Option(index = "1.2", pkg = @Pkg(label = "[[GetToken.authType.specificUser.label]]", value =
+                            "authenticate"))})
             @Pkg(label = "[[GetToken.authType.label]]", description = "[[GetToken.authType.description]]",
                     default_value = "user", default_value_type = DataType.STRING)
             @NotEmpty
@@ -77,8 +60,10 @@ public class GetToken {
             SecureString username,
 
             @Idx(index = "1.2.2", type = AttributeType.RADIO, options = {
-                    @Idx.Option(index = "1.2.2.1", pkg = @Pkg(label = "[[GetToken.authMethod.password.label]]", value = "password")),
-                    @Idx.Option(index = "1.2.2.2", pkg = @Pkg(label = "[[GetToken.authMethod.apiKey.label]]", value = "apikey"))})
+                    @Idx.Option(index = "1.2.2.1", pkg = @Pkg(label = "[[GetToken.authMethod.password.label]]",
+                            value = "password")),
+                    @Idx.Option(index = "1.2.2.2", pkg = @Pkg(label = "[[GetToken.authMethod.apiKey.label]]", value =
+                            "apikey"))})
             @Pkg(label = "[[GetToken.authMethod.label]]", description = "[[GetToken.authMethod.description]]",
                     default_value = "password", default_value_type = DataType.STRING)
             @NotEmpty
@@ -91,8 +76,10 @@ public class GetToken {
             SecureString authDetails,
 
             @Idx(index = "1.2.4", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "1.2.4.1", pkg = @Pkg(label = "[[GetToken.CRType.currentCR.label]]", value = "current")),
-                    @Idx.Option(index = "1.2.4.2", pkg = @Pkg(label = "[[GetToken.CRType.specificCR.label]]", value = "specific"))})
+                    @Idx.Option(index = "1.2.4.1", pkg = @Pkg(label = "[[GetToken.CRType.currentCR.label]]", value =
+                            "current")),
+                    @Idx.Option(index = "1.2.4.2", pkg = @Pkg(label = "[[GetToken.CRType.specificCR.label]]", value =
+                            "specific"))})
             @Pkg(label = "[[GetToken.CRType.label]]", default_value = "current", default_value_type = DataType.STRING)
             @NotEmpty
             @SelectModes String CRType,
@@ -136,5 +123,27 @@ public class GetToken {
         }
 
 
+    }
+
+    private String getCRURL(SecureString URL, String CRType) {
+        if (CRType.equalsIgnoreCase("current")) {
+            return this.globalSessionContext.getCrUrl();
+        }
+
+        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
+        if (isValidURL(expectedURLformat)) {
+            return expectedURLformat;
+        } else {
+            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
+        }
+    }
+
+    public static boolean isValidURL(String urlString) {
+        try {
+            new URL(urlString);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }

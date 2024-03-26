@@ -12,7 +12,6 @@ import com.automationanywhere.commandsdk.annotations.rules.CredentialOnly;
 import com.automationanywhere.commandsdk.annotations.rules.NotEmpty;
 import com.automationanywhere.commandsdk.i18n.Messages;
 import com.automationanywhere.commandsdk.i18n.MessagesFactory;
-import com.automationanywhere.commandsdk.model.AllowedTarget;
 import com.automationanywhere.commandsdk.model.AttributeType;
 import com.automationanywhere.commandsdk.model.DataType;
 import com.automationanywhere.core.security.SecureString;
@@ -21,7 +20,8 @@ import com.automationanywhere.core.security.SecureString;
 @CommandPkg(label = "[[GetCredential.label]]", description = "[[GetCredential.description]]", icon = "credential.svg",
         name = "GetCred", return_label = "[[GetCredential.action.return_label]]",
         node_label = "[[GetCredential.action.node_label]]", return_type = DataType.STRING, return_required = true,
-        allowed_agent_targets = AllowedTarget.HEADLESS, documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetCredential.md")
+//        allowed_agent_targets = AllowedTarget.HEADLESS,
+        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetCredential.md")
 public class GetCredential {
     private static final Messages MESSAGES = MessagesFactory
             .getMessages("com.automationanywhere.botcommand.messages.messages");
@@ -39,10 +39,11 @@ public class GetCredential {
                 String result = credentials.getInsecureString();
                 return new StringValue(result);
             } catch (Exception e) {
-                if (retry == retryLimit)
+                if (retry == retryLimit) {
                     throw new BotCommandException(MESSAGES.getString("credentialFetchError", e.getMessage()));
-                else
+                } else {
                     Thread.sleep(retry * 2000L);
+                }
             }
         }
 

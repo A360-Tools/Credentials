@@ -16,7 +16,8 @@ public class GetDynamicCredentialTest {
     private final String authMethod = "password";  // password or apikey
     private final SecureString authDetails = new CredentialObject("mypass").get();
     private final String CRType = "specific";// current or specific
-    private final SecureString specificCRURL = new CredentialObject("https://community.cloud.automationanywhere.digital/").get();// Use if CRType is specific
+    private final SecureString specificCRURL = new CredentialObject("https://community.cloud.automationanywhere" +
+            ".digital/").get();// Use if CRType is specific
     private GetDynamicCredential credentialFetcher;
 
     @BeforeClass
