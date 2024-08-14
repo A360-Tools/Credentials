@@ -16,6 +16,7 @@ import com.automationanywhere.commandsdk.model.AttributeType;
 import com.automationanywhere.commandsdk.model.DataType;
 import com.automationanywhere.core.security.SecureString;
 
+//Credential to Text
 @BotCommand
 @CommandPkg(label = "[[GetCredential.label]]", description = "[[GetCredential.description]]", icon = "credential.svg",
         name = "GetCred", return_label = "[[GetCredential.action.return_label]]",

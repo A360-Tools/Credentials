@@ -17,18 +17,24 @@ import com.automationanywhere.utilities.CRRequests;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Base64;
 
+import static com.automationanywhere.utilities.AuthenticationUtils.*;
+
+//Get dynamic credential
 @BotCommand
-@CommandPkg(label = "[[GetDynamicCred.label]]", description = "[[GetDynamicCred.description]]",
-        icon = "credential.svg", name = "GetDynamicCred",
+@CommandPkg(
+        label = "[[GetDynamicCred.label]]",
+        description = "[[GetDynamicCred.description]]",
+        icon = "credential.svg",
+        name = "GetDynamicCred",
         node_label = "[[GetDynamicCred.node_label]]",
-        return_label = "[[GetDynamicCred.return_label]]", return_required = true,
-        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetDynamicCredential.md",
-        return_type = DataType.CREDENTIAL)
+        return_label = "[[GetDynamicCred.return_label]]",
+        return_type = DataType.CREDENTIAL,
+        return_required = true
+)
 public class GetDynamicCredential {
+
     private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages" +
             ".messages");
 
@@ -53,11 +59,11 @@ public class GetDynamicCredential {
 
             @Idx(index = "3", type = AttributeType.SELECT, options = {
                     @Idx.Option(index = "3.1", pkg = @Pkg(label = "[[GetDynamicCred.authType.currentUser.label]]",
-                            value = "user")),
+                            value = AUTH_TYPE_USER)),
                     @Idx.Option(index = "3.2", pkg = @Pkg(label = "[[GetDynamicCred.authType.specificUser.label]]",
-                            value = "authenticate"))})
+                            value = AUTH_TYPE_AUTHENTICATE))})
             @Pkg(label = "[[GetDynamicCred.authType.label]]", description = "[[GetDynamicCred.authType.description]]",
-                    default_value = "user", default_value_type = DataType.STRING)
+                    default_value = AUTH_TYPE_USER, default_value_type = DataType.STRING)
             @NotEmpty
             @SelectModes String authType,
 
@@ -68,11 +74,12 @@ public class GetDynamicCredential {
 
             @Idx(index = "3.2.2", type = AttributeType.RADIO, options = {
                     @Idx.Option(index = "3.2.2.1", pkg = @Pkg(label = "[[GetDynamicCred.authMethod.password.label]]",
-                            value = "password")),
+                            value = AUTH_METHOD_PASSWORD)),
                     @Idx.Option(index = "3.2.2.2", pkg = @Pkg(label = "[[GetDynamicCred.authMethod.apiKey.label]]",
-                            value = "apikey"))})
-            @Pkg(label = "[[GetDynamicCred.authMethod.label]]", default_value = "password", default_value_type =
-                    DataType.STRING)
+                            value = AUTH_METHOD_APIKEY))
+            })
+            @Pkg(label = "[[GetDynamicCred.authMethod.label]]", default_value = AUTH_METHOD_PASSWORD,
+                    default_value_type = DataType.STRING)
             @NotEmpty String authMethod,
 
             @Idx(index = "3.2.3", type = AttributeType.CREDENTIAL)
@@ -82,23 +89,26 @@ public class GetDynamicCredential {
 
             @Idx(index = "3.2.4", type = AttributeType.SELECT, options = {
                     @Idx.Option(index = "3.2.4.1", pkg = @Pkg(label = "[[GetDynamicCred.CRType.currentCR.label]]",
-                            value = "current")),
+                            value = CR_TYPE_CURRENT)),
                     @Idx.Option(index = "3.2.4.2", pkg = @Pkg(label = "[[GetDynamicCred.CRType.specificCR.label]]",
-                            value = "specific"))})
-            @Pkg(label = "[[GetDynamicCred.CRType.label]]", default_value = "current", default_value_type =
+                            value = CR_TYPE_SPECIFIC))
+            })
+            @Pkg(label = "[[GetDynamicCred.CRType.label]]", default_value = CR_TYPE_CURRENT, default_value_type =
                     DataType.STRING)
-            @NotEmpty
-            @SelectModes String CRType,
+            @SelectModes
+            @NotEmpty String crType,
 
             @Idx(index = "3.2.4.2.1", type = AttributeType.CREDENTIAL)
-            @Pkg(label = "[[GetDynamicCred.specificCR.label]]", default_value_type = DataType.CREDENTIAL)
+            @Pkg(label = "[[GetDynamicCred.specificCR.label]]")
             @NotEmpty
             @CredentialAllowPassword SecureString specificCRURL,
 
             @Idx(index = "3.2.5", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.2.5.1", pkg = @Pkg(label = "v1", value = "v1")),
-                    @Idx.Option(index = "3.2.5.2", pkg = @Pkg(label = "v2", value = "v2"))})
-            @Pkg(label = "Authentication Version", default_value = "v2", default_value_type = DataType.STRING)
+                    @Idx.Option(index = "3.2.5.1", pkg = @Pkg(label = "v1", value = AUTH_VERSION_V1)),
+                    @Idx.Option(index = "3.2.5.2", pkg = @Pkg(label = "v2", value = AUTH_VERSION_V2))
+            })
+            @Pkg(label = "Authentication Version", default_value = AUTH_VERSION_V2, default_value_type =
+                    DataType.STRING)
             @NotEmpty String authVersion
     ) {
         try {
@@ -109,24 +119,27 @@ public class GetDynamicCredential {
                 throw new BotCommandException("Attribute name is empty");
             }
 
-            String CRURL;
-            String TOKEN;
             CRRequests crRequestsObject;
+            String crUrl;
             switch (authType) {
-                case "user":
-                    CRURL = this.globalSessionContext.getCrUrl();
-                    TOKEN = this.globalSessionContext.getUserToken();
-                    crRequestsObject = new CRRequests(CRURL, TOKEN);
+                case AUTH_TYPE_USER:
+                    crUrl = this.globalSessionContext.getCrUrl();
+                    String token = this.globalSessionContext.getUserToken();
+                    crRequestsObject = new CRRequests(crUrl, token);
                     break;
-                case "authenticate":
-                    CRURL = getCRURL(specificCRURL, CRType);
+                case AUTH_TYPE_AUTHENTICATE:
+                    if (crType.equals(CR_TYPE_CURRENT)) {
+                        crUrl = globalSessionContext.getCrUrl();
+                    } else {
+                        crUrl = getSanitziedCRURL(specificCRURL.getInsecureString());
+                    }
                     switch (authMethod) {
-                        case "password":
-                            crRequestsObject = CRRequests.withPassword(CRURL, username.getInsecureString(),
+                        case AUTH_METHOD_PASSWORD:
+                            crRequestsObject = CRRequests.withPassword(crUrl, username.getInsecureString(),
                                     authDetails.getInsecureString(), authVersion);
                             break;
-                        case "apikey":
-                            crRequestsObject = CRRequests.withApiKey(CRURL, username.getInsecureString(),
+                        case AUTH_METHOD_APIKEY:
+                            crRequestsObject = CRRequests.withApiKey(crUrl, username.getInsecureString(),
                                     authDetails.getInsecureString(), authVersion);
                             break;
                         default:
@@ -143,18 +156,6 @@ public class GetDynamicCredential {
         }
     }
 
-    private String getCRURL(SecureString URL, String CRType) {
-        if (CRType.equalsIgnoreCase("current")) {
-            return this.globalSessionContext.getCrUrl();
-        }
-
-        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
-        if (isValidURL(expectedURLformat)) {
-            return expectedURLformat;
-        } else {
-            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
-        }
-    }
 
     private CredentialObject fetchCredentialAttribute(String credentialName, String attributeName,
                                                       CRRequests crRequestsObject) {
@@ -166,15 +167,6 @@ public class GetDynamicCredential {
         String credValue = getAttributeValue(crRequestsObject, credentialID, credentialAttributeId, UserId);
 
         return new CredentialObject(credValue);
-    }
-
-    public static boolean isValidURL(String urlString) {
-        try {
-            new URL(urlString);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
     }
 
     private String getUserIdFromToken(String TOKEN) {

@@ -1,6 +1,3 @@
-/**
- * @author Sumit Kumar
- */
 package com.automationanywhere.botcommand.actions;
 
 import com.automationanywhere.bot.service.GlobalSessionContext;
@@ -21,20 +18,24 @@ import com.automationanywhere.utilities.CRRequests;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.automationanywhere.utilities.AuthenticationUtils.*;
+
 @BotCommand
-@CommandPkg(label = "[[GetDynamicCredAttributes.label]]", description = "[[GetDynamicCredAttributes.description]]",
-        icon = "credential.svg", name = "GetDynamicCredAttributes",
-        node_label = "[[GetDynamicCredAttributes.node_label]]",
-        return_label = "[[GetDynamicCredAttributes.return_label]]", return_Direct = true, return_required = true,
-        documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs" +
-                "/GetDynamicCredentialAttributes.md",
-        return_type = DataType.DICTIONARY, return_sub_type = DataType.STRING)
+@CommandPkg(
+        label = "[[GetDynamicCredAttributes.label]]",
+        description = "[[GetDynamicCredAttributes.description]]",
+        icon = "credential.svg",
+        name = "GetDynamicCredAttributes",
+        return_label = "[[GetDynamicCredAttributes.return_label]]",
+        return_type = DataType.DICTIONARY,
+        return_sub_type = DataType.STRING,
+        return_required = true
+)
 public class GetDynamicCredentialAttributes {
+
     private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages" +
             ".messages");
 
@@ -48,86 +49,90 @@ public class GetDynamicCredentialAttributes {
     @Execute
     public DictionaryValue execute(
             @Idx(index = "1", type = AttributeType.TEXT)
-            @Pkg(label = "[[GetDynamicCredAttributes.credentialName.label]]", default_value_type = DataType.STRING,
-                    description = "[[GetDynamicCredAttributes.credentialName.description]]")
+            @Pkg(label = "[[GetDynamicCredAttributes.credentialName.label]]", description =
+                    "[[GetDynamicCredAttributes.credentialName.description]]")
             @NotEmpty String credentialName,
 
-            @Idx(index = "3", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authType.currentUser" +
-                            ".label]]", value = "user")),
-                    @Idx.Option(index = "3.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authType.specificUser" +
-                            ".label]]", value = "authenticate"))})
-            @Pkg(label = "[[GetDynamicCredAttributes.authType.label]]", description = "[[GetDynamicCredAttributes" +
-                    ".authType.description]]",
-                    default_value = "user", default_value_type = DataType.STRING)
-            @NotEmpty
-            @SelectModes String authType,
+            @Idx(index = "2", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "2.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authType.currentUser" +
+                            ".label]]", value = AUTH_TYPE_USER)),
+                    @Idx.Option(index = "2.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authType.specificUser" +
+                            ".label]]", value = AUTH_TYPE_AUTHENTICATE))
+            })
+            @Pkg(label = "[[GetDynamicCredAttributes.authType.label]]", default_value = AUTH_TYPE_USER,
+                    default_value_type = DataType.STRING)
+            @SelectModes
+            @NotEmpty String authType,
 
-            @Idx(index = "3.2.1", type = AttributeType.CREDENTIAL)
+            @Idx(index = "2.2.1", type = AttributeType.CREDENTIAL)
             @Pkg(label = "[[GetDynamicCredAttributes.username.label]]")
             @NotEmpty
             @CredentialAllowPassword SecureString username,
 
-            @Idx(index = "3.2.2", type = AttributeType.RADIO, options = {
-                    @Idx.Option(index = "3.2.2.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authMethod.password" +
-                            ".label]]", value = "password")),
-                    @Idx.Option(index = "3.2.2.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authMethod.apiKey" +
-                            ".label]]", value = "apikey"))})
-            @Pkg(label = "[[GetDynamicCred.authMethod.label]]", default_value = "password", default_value_type =
-                    DataType.STRING)
+            @Idx(index = "2.2.2", type = AttributeType.RADIO, options = {
+                    @Idx.Option(index = "2.2.2.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authMethod.password" +
+                            ".label]]", value = AUTH_METHOD_PASSWORD)),
+                    @Idx.Option(index = "2.2.2.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authMethod.apiKey" +
+                            ".label]]", value = AUTH_METHOD_APIKEY))
+            })
+            @Pkg(label = "[[GetDynamicCredAttributes.authMethod.label]]", default_value = AUTH_METHOD_PASSWORD,
+                    default_value_type = DataType.STRING)
             @NotEmpty String authMethod,
 
-            @Idx(index = "3.2.3", type = AttributeType.CREDENTIAL)
+            @Idx(index = "2.2.3", type = AttributeType.CREDENTIAL)
             @Pkg(label = "[[GetDynamicCredAttributes.authDetails.label]]")
             @NotEmpty
             @CredentialAllowPassword SecureString authDetails,
 
-            @Idx(index = "3.2.4", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.2.4.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.CRType.currentCR" +
-                            ".label]]", value = "current")),
-                    @Idx.Option(index = "3.2.4.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.CRType.specificCR" +
-                            ".label]]", value = "specific"))})
-            @Pkg(label = "[[GetDynamicCredAttributes.CRType.label]]", default_value = "current", default_value_type =
-                    DataType.STRING)
-            @NotEmpty
-            @SelectModes String CRType,
+            @Idx(index = "2.2.4", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "2.2.4.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.CRType.currentCR" +
+                            ".label]]", value = CR_TYPE_CURRENT)),
+                    @Idx.Option(index = "2.2.4.2", pkg = @Pkg(label = "[[GetDynamicCredAttributes.CRType.specificCR" +
+                            ".label]]", value = CR_TYPE_SPECIFIC))
+            })
+            @Pkg(label = "[[GetDynamicCredAttributes.CRType.label]]", default_value = CR_TYPE_CURRENT,
+                    default_value_type = DataType.STRING)
+            @SelectModes
+            @NotEmpty String crType,
 
-            @Idx(index = "3.2.4.2.1", type = AttributeType.CREDENTIAL)
-            @Pkg(label = "[[GetDynamicCredAttributes.attributeName.label]]", default_value_type = DataType.CREDENTIAL,
-                    description = "[[GetDynamicCredAttributes.attributeName.description]]")
+            @Idx(index = "2.2.4.2.1", type = AttributeType.CREDENTIAL)
+            @Pkg(label = "[[GetDynamicCredAttributes.specificCR.label]]")
             @NotEmpty
             @CredentialAllowPassword SecureString specificCRURL,
 
-            @Idx(index = "3.2.5", type = AttributeType.SELECT, options = {
-                    @Idx.Option(index = "3.2.5.1", pkg = @Pkg(label = "v1", value = "v1")),
-                    @Idx.Option(index = "3.2.5.2", pkg = @Pkg(label = "v2", value = "v2"))})
-            @Pkg(label = "Authentication Version", default_value = "v2", default_value_type = DataType.STRING)
+            @Idx(index = "2.2.5", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "2.2.5.1", pkg = @Pkg(label = "v1", value = AUTH_VERSION_V1)),
+                    @Idx.Option(index = "2.2.5.2", pkg = @Pkg(label = "v2", value = AUTH_VERSION_V2))
+            })
+            @Pkg(label = "Authentication Version", default_value = AUTH_VERSION_V2, default_value_type =
+                    DataType.STRING)
             @NotEmpty String authVersion
     ) {
         try {
             if (credentialName == null || credentialName.isEmpty()) {
                 throw new BotCommandException("Credential name is empty");
             }
-
-            String CRURL;
-            String TOKEN;
             CRRequests crRequestsObject;
-
+            String crUrl;
             switch (authType) {
-                case "user":
-                    CRURL = this.globalSessionContext.getCrUrl();
-                    TOKEN = this.globalSessionContext.getUserToken();
-                    crRequestsObject = new CRRequests(CRURL, TOKEN);
+                case AUTH_TYPE_USER:
+                    crUrl = this.globalSessionContext.getCrUrl();
+                    String token = this.globalSessionContext.getUserToken();
+                    crRequestsObject = new CRRequests(crUrl, token);
                     break;
-                case "authenticate":
-                    CRURL = getCRURL(specificCRURL, CRType);
+                case AUTH_TYPE_AUTHENTICATE:
+                    if (crType.equals(CR_TYPE_CURRENT)) {
+                        crUrl = globalSessionContext.getCrUrl();
+                    } else {
+                        crUrl = getSanitziedCRURL(specificCRURL.getInsecureString());
+                    }
                     switch (authMethod) {
-                        case "password":
-                            crRequestsObject = CRRequests.withPassword(CRURL, username.getInsecureString(),
+                        case AUTH_METHOD_PASSWORD:
+                            crRequestsObject = CRRequests.withPassword(crUrl, username.getInsecureString(),
                                     authDetails.getInsecureString(), authVersion);
                             break;
-                        case "apikey":
-                            crRequestsObject = CRRequests.withApiKey(CRURL, username.getInsecureString(),
+                        case AUTH_METHOD_APIKEY:
+                            crRequestsObject = CRRequests.withApiKey(crUrl, username.getInsecureString(),
                                     authDetails.getInsecureString(), authVersion);
                             break;
                         default:
@@ -144,19 +149,6 @@ public class GetDynamicCredentialAttributes {
         }
     }
 
-    private String getCRURL(SecureString URL, String CRType) {
-        if (CRType.equalsIgnoreCase("current")) {
-            return this.globalSessionContext.getCrUrl();
-        }
-
-        String expectedURLformat = URL.getInsecureString().replaceAll("/+$", "");
-        if (isValidURL(expectedURLformat)) {
-            return expectedURLformat;
-        } else {
-            throw new BotCommandException(MESSAGES.getString("invalidCRURL", URL));
-        }
-    }
-
     private DictionaryValue fetchCredentialAttributes(String credentialName, CRRequests crRequestsObject) {
         JSONObject credential = getCredentialByName(crRequestsObject, credentialName);
         JSONArray attributes = credential.getJSONArray("attributes");
@@ -166,15 +158,6 @@ public class GetDynamicCredentialAttributes {
             attributesMap.put(currentAttribute.getString("id"), new StringValue(currentAttribute.getString("name")));
         }
         return new DictionaryValue(attributesMap);
-    }
-
-    public static boolean isValidURL(String urlString) {
-        try {
-            new URL(urlString);
-            return true;
-        } catch (MalformedURLException e) {
-            return false;
-        }
     }
 
     private JSONObject getCredentialByName(CRRequests crRequestsObject, String credentialName) {
