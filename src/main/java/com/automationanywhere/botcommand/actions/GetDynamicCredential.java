@@ -1,6 +1,3 @@
-/**
- * @author Sumit Kumar
- */
 package com.automationanywhere.botcommand.actions;
 
 import com.automationanywhere.bot.service.GlobalSessionContext;
@@ -29,7 +26,6 @@ import java.util.Base64;
         icon = "credential.svg", name = "GetDynamicCred",
         node_label = "[[GetDynamicCred.node_label]]",
         return_label = "[[GetDynamicCred.return_label]]", return_required = true,
-//        allowed_agent_targets = AllowedTarget.HEADLESS,
         documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetDynamicCredential.md",
         return_type = DataType.CREDENTIAL)
 public class GetDynamicCredential {
@@ -97,8 +93,13 @@ public class GetDynamicCredential {
             @Idx(index = "3.2.4.2.1", type = AttributeType.CREDENTIAL)
             @Pkg(label = "[[GetDynamicCred.specificCR.label]]", default_value_type = DataType.CREDENTIAL)
             @NotEmpty
-            @CredentialAllowPassword SecureString specificCRURL
+            @CredentialAllowPassword SecureString specificCRURL,
 
+            @Idx(index = "3.2.5", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "3.2.5.1", pkg = @Pkg(label = "v1", value = "v1")),
+                    @Idx.Option(index = "3.2.5.2", pkg = @Pkg(label = "v2", value = "v2"))})
+            @Pkg(label = "Authentication Version", default_value = "v2", default_value_type = DataType.STRING)
+            @NotEmpty String authVersion
     ) {
         try {
             if (credentialName == null || credentialName.isEmpty()) {
@@ -121,12 +122,12 @@ public class GetDynamicCredential {
                     CRURL = getCRURL(specificCRURL, CRType);
                     switch (authMethod) {
                         case "password":
-                            crRequestsObject = CRRequests
-                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString());
+                            crRequestsObject = CRRequests.withPassword(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion);
                             break;
                         case "apikey":
-                            crRequestsObject = CRRequests
-                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString());
+                            crRequestsObject = CRRequests.withApiKey(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion);
                             break;
                         default:
                             throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
@@ -138,10 +139,8 @@ public class GetDynamicCredential {
 
             return fetchCredentialAttribute(credentialName, attributeName, crRequestsObject);
         } catch (Exception e) {
-            // required to provide proper error message on UI
             throw new BotCommandException(e.toString());
         }
-
     }
 
     private String getCRURL(SecureString URL, String CRType) {

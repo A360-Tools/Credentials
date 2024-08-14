@@ -1,6 +1,3 @@
-/**
- * @author Sumit Kumar
- */
 package com.automationanywhere.botcommand.actions;
 
 import com.automationanywhere.bot.service.GlobalSessionContext;
@@ -21,18 +18,17 @@ import com.automationanywhere.utilities.CRRequests;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 @BotCommand
 @CommandPkg(label = "[[GetToken.label]]", description = "[[GetToken.description]]", icon = "credential.svg", name =
         "GetToken",
         return_label = "[[GetToken.return.label]]", node_label = "[[GetToken.node.label]]", return_type =
         DataType.CREDENTIAL,
         return_required = true,
-//        allowed_agent_targets = AllowedTarget.HEADLESS,
         documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs/GetToken.md")
 public class GetToken {
-    private static final Messages MESSAGES = MessagesFactory
-            .getMessages("com.automationanywhere.botcommand.messages.messages");
+    private static final Messages MESSAGES = MessagesFactory.getMessages("com.automationanywhere.botcommand.messages" +
+            ".messages");
+
     @com.automationanywhere.commandsdk.annotations.GlobalSessionContext
     private GlobalSessionContext globalSessionContext;
 
@@ -87,7 +83,13 @@ public class GetToken {
             @Idx(index = "1.2.4.2.1", type = AttributeType.CREDENTIAL)
             @Pkg(label = "[[GetToken.specificCR.label]]", default_value_type = DataType.CREDENTIAL)
             @NotEmpty
-            @CredentialAllowPassword SecureString specificCRURL) {
+            @CredentialAllowPassword SecureString specificCRURL,
+
+            @Idx(index = "1.2.5", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "1.2.5.1", pkg = @Pkg(label = "v1", value = "v1")),
+                    @Idx.Option(index = "1.2.5.2", pkg = @Pkg(label = "v2", value = "v2"))})
+            @Pkg(label = "Authentication Version", default_value = "v2", default_value_type = DataType.STRING)
+            @NotEmpty String authVersion) {
         try {
             String CRURL;
             String TOKEN;
@@ -100,14 +102,12 @@ public class GetToken {
                     CRURL = getCRURL(specificCRURL, CRType);
                     switch (authMethod) {
                         case "password":
-                            TOKEN = CRRequests
-                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            TOKEN = CRRequests.withPassword(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion).getToken();
                             break;
                         case "apikey":
-                            TOKEN = CRRequests
-                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString())
-                                    .getToken();
+                            TOKEN = CRRequests.withApiKey(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion).getToken();
                             break;
                         default:
                             throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", "authMethod"));
@@ -118,11 +118,8 @@ public class GetToken {
             }
             return new CredentialObject(TOKEN);
         } catch (Exception e) {
-            // required to provide proper error message on UI
             throw new BotCommandException(e.toString());
         }
-
-
     }
 
     private String getCRURL(SecureString URL, String CRType) {

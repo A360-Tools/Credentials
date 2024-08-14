@@ -1,6 +1,3 @@
-/**
- * @author Sumit Kumar
- */
 package com.automationanywhere.utilities;
 
 import org.json.JSONObject;
@@ -10,8 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class CRRequests {
-    private static final String AUTHENTICATION_URI = "/v1/authentication";
-    private static final String LOCKERS_LIST_URI = "/v2/credentialvault/lockers/list";
+    private static final String AUTHENTICATION_URI_V1 = "/v1/authentication";
+    private static final String AUTHENTICATION_URI_V2 = "/v2/authentication";
     private static final String CREDENTIALS_LIST_URI = "/v2/credentialvault/credentials/list";
     private static final String ATTRIBUTE_VALUES_URI = "/v2/credentialvault/credentials/%s/attributevalues";
     private final Map<String, String> headers;
@@ -31,13 +28,13 @@ public final class CRRequests {
         return headers;
     }
 
-    public static CRRequests withPassword(String CRURL, String username, String password) {
-        String token = getTokenByPassword(CRURL, username, password);
+    public static CRRequests withPassword(String CRURL, String username, String password, String version) {
+        String token = getTokenByPassword(CRURL, username, password, version);
         return new CRRequests(CRURL, token);
     }
 
-    private static String getTokenByPassword(String CRURL, String username, String password) {
-        String authURI = CRURL + AUTHENTICATION_URI;
+    private static String getTokenByPassword(String CRURL, String username, String password, String version) {
+        String authURI = CRURL + (version.equals("v2") ? AUTHENTICATION_URI_V2 : AUTHENTICATION_URI_V1);
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("username", username);
         jsonBody.put("password", password);
@@ -47,13 +44,13 @@ public final class CRRequests {
         return new JSONObject(response).getString("token");
     }
 
-    public static CRRequests withApiKey(String CRURL, String username, String apikey) {
-        String token = getTokenByKey(CRURL, username, apikey);
+    public static CRRequests withApiKey(String CRURL, String username, String apikey, String version) {
+        String token = getTokenByKey(CRURL, username, apikey, version);
         return new CRRequests(CRURL, token);
     }
 
-    private static String getTokenByKey(String CRURL, String username, String apikey) {
-        String authURI = CRURL + AUTHENTICATION_URI;
+    private static String getTokenByKey(String CRURL, String username, String apikey, String version) {
+        String authURI = CRURL + (version.equals("v2") ? AUTHENTICATION_URI_V2 : AUTHENTICATION_URI_V1);
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("username", username);
         jsonBody.put("apiKey", apikey);

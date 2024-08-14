@@ -31,7 +31,6 @@ import java.util.Map;
         icon = "credential.svg", name = "GetDynamicCredAttributes",
         node_label = "[[GetDynamicCredAttributes.node_label]]",
         return_label = "[[GetDynamicCredAttributes.return_label]]", return_Direct = true, return_required = true,
-//        allowed_agent_targets = AllowedTarget.HEADLESS,
         documentation_url = "https://github.com/A360-Tools/Credentials/blob/main/src/main/docs" +
                 "/GetDynamicCredentialAttributes.md",
         return_type = DataType.DICTIONARY, return_sub_type = DataType.STRING)
@@ -52,7 +51,6 @@ public class GetDynamicCredentialAttributes {
             @Pkg(label = "[[GetDynamicCredAttributes.credentialName.label]]", default_value_type = DataType.STRING,
                     description = "[[GetDynamicCredAttributes.credentialName.description]]")
             @NotEmpty String credentialName,
-
 
             @Idx(index = "3", type = AttributeType.SELECT, options = {
                     @Idx.Option(index = "3.1", pkg = @Pkg(label = "[[GetDynamicCredAttributes.authType.currentUser" +
@@ -98,8 +96,13 @@ public class GetDynamicCredentialAttributes {
             @Pkg(label = "[[GetDynamicCredAttributes.attributeName.label]]", default_value_type = DataType.CREDENTIAL,
                     description = "[[GetDynamicCredAttributes.attributeName.description]]")
             @NotEmpty
-            @CredentialAllowPassword SecureString specificCRURL
+            @CredentialAllowPassword SecureString specificCRURL,
 
+            @Idx(index = "3.2.5", type = AttributeType.SELECT, options = {
+                    @Idx.Option(index = "3.2.5.1", pkg = @Pkg(label = "v1", value = "v1")),
+                    @Idx.Option(index = "3.2.5.2", pkg = @Pkg(label = "v2", value = "v2"))})
+            @Pkg(label = "Authentication Version", default_value = "v2", default_value_type = DataType.STRING)
+            @NotEmpty String authVersion
     ) {
         try {
             if (credentialName == null || credentialName.isEmpty()) {
@@ -120,12 +123,12 @@ public class GetDynamicCredentialAttributes {
                     CRURL = getCRURL(specificCRURL, CRType);
                     switch (authMethod) {
                         case "password":
-                            crRequestsObject = CRRequests
-                                    .withPassword(CRURL, username.getInsecureString(), authDetails.getInsecureString());
+                            crRequestsObject = CRRequests.withPassword(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion);
                             break;
                         case "apikey":
-                            crRequestsObject = CRRequests
-                                    .withApiKey(CRURL, username.getInsecureString(), authDetails.getInsecureString());
+                            crRequestsObject = CRRequests.withApiKey(CRURL, username.getInsecureString(),
+                                    authDetails.getInsecureString(), authVersion);
                             break;
                         default:
                             throw new BotCommandException(MESSAGES.getString("invalidAuthMethod", authMethod));
@@ -137,10 +140,8 @@ public class GetDynamicCredentialAttributes {
 
             return fetchCredentialAttributes(credentialName, crRequestsObject);
         } catch (Exception e) {
-            // required to provide proper error message on UI
             throw new BotCommandException(e.toString());
         }
-
     }
 
     private String getCRURL(SecureString URL, String CRType) {

@@ -7,9 +7,6 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotNull;
 
-/**
- * @author Sumit Kumar
- */
 public class GetDynamicCredentialTest {
     private final SecureString username = new CredentialObject("myemail@email.com").get();
     private final String authType = "authenticate";  // user or authenticate
@@ -18,6 +15,7 @@ public class GetDynamicCredentialTest {
     private final String CRType = "specific";// current or specific
     private final SecureString specificCRURL = new CredentialObject("https://community.cloud.automationanywhere" +
             ".digital/").get();// Use if CRType is specific
+    private final String authVersion = "v2"; // v1 or v2
     private GetDynamicCredential credentialFetcher;
 
     @BeforeClass
@@ -27,15 +25,15 @@ public class GetDynamicCredentialTest {
 
     @Test
     public void testFetchCredential() throws Exception {
-        String credentialName = "test_crd";
+        String credentialName = "test_cred";
         String attributeName = "username";
         Value<SecureString> credentialObject = credentialFetcher.execute(
-                credentialName, attributeName, authType, username, authMethod, authDetails, CRType, specificCRURL);
+                credentialName, attributeName, authType, username, authMethod, authDetails, CRType, specificCRURL,
+                authVersion);
 
         assertNotNull(credentialObject);
         String credentialValue = credentialObject.get().getInsecureString();
         assertNotNull(credentialValue);
         System.out.println(credentialValue);
     }
-
 }
