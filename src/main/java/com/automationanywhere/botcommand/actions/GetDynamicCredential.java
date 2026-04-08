@@ -163,8 +163,11 @@ public class GetDynamicCredential {
         JSONObject credential = getCredentialByName(crRequestsObject, credentialName);
         String credentialID = credential.getString("id");
         JSONArray attributes = credential.getJSONArray("attributes");
-        String credentialAttributeId = getAttributeIdByName(attributes, attributeName);
-        String credValue = getAttributeValue(crRequestsObject, credentialID, credentialAttributeId, UserId);
+        JSONObject attribute = getAttributeByName(attributes, attributeName);
+        String credentialAttributeId = attribute.getString("id");
+        boolean userProvided = attribute.optBoolean("userProvided", false);
+        String credValue = getAttributeValue(crRequestsObject, credentialID, credentialAttributeId, UserId,
+                userProvided);
 
         return new CredentialObject(credValue);
     }
@@ -187,19 +190,20 @@ public class GetDynamicCredential {
         return list.getJSONObject(0);
     }
 
-    private String getAttributeIdByName(JSONArray attributes, String attributeName) {
+    private JSONObject getAttributeByName(JSONArray attributes, String attributeName) {
         for (int i = 0; i < attributes.length(); i++) {
             JSONObject currentAttribute = attributes.getJSONObject(i);
             if (currentAttribute.getString("name").equals(attributeName)) {
-                return currentAttribute.getString("id");
+                return currentAttribute;
             }
         }
         throw new BotCommandException(MESSAGES.getString("invalidAttributeName", attributeName));
     }
 
     private String getAttributeValue(CRRequests crRequestsObject, String credentialID, String credentialAttributeId,
-                                     String UserId) {
-        String response = crRequestsObject.getAttributeValue(credentialID, credentialAttributeId, UserId);
+                                     String UserId, boolean userProvided) {
+        String response = crRequestsObject.getAttributeValue(credentialID, credentialAttributeId, UserId,
+                userProvided);
         JSONObject responseJSON = new JSONObject(response);
         JSONArray list = responseJSON.getJSONArray("list");
 

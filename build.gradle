@@ -5,31 +5,35 @@ buildscript {
             dirs 'libs'
         }
         dependencies {
-            classpath name: 'package-compileonly-sdk', version: '1.3.0'
-            classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.1"
+            classpath name: 'package-compileonly-sdk', version: '1.7.0'
+            classpath "com.gradleup.shadow:shadow-gradle-plugin:9.1.0"
         }
     }
 }
 
 plugins {
     id 'java'
+    id 'com.github.ben-manes.versions' version '0.53.0'
 }
 
 configure(allprojects) {
 
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'com.gradleup.shadow'
     apply plugin: "com.automationanywhere.command-codegen"
 
     ext {
         groupName = 'com.automationanywhere'
-        testNgVersion = '6.14.3'
-        loggerVersion = '2.20.0'
-        jnaVersion = '5.3.1'
-        version '3.3.0'
+        testNgVersion = '7.12.0'
+        loggerVersion = '2.25.3'
+        version '3.5.0'
     }
     group "$groupName"
 
-    sourceCompatibility = JavaVersion.VERSION_11
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(11)
+        }
+    }
 
     compileJava.options.encoding = 'UTF-8'
     compileTestJava.options.encoding = 'UTF-8'
@@ -52,7 +56,7 @@ configure(allprojects) {
 
     shadowJar {
         archiveBaseName = project.name
-        classifier = null
+        archiveClassifier = ''
         mergeServiceFiles('META-INF/spring.*')
         mergeServiceFiles('META-INF/services/java.sql.Driver')
         zip64 = true
@@ -63,19 +67,18 @@ configure(allprojects) {
     }
 
     dependencies {
-        annotationProcessor name: 'package-compileonly-sdk', version: '1.4.0'
-
-        compileOnly name: 'package-compileonly-sdk', version: '1.4.0'
+        annotationProcessor name: 'package-compileonly-sdk', version: '1.7.0'
+        compileOnly name: 'package-compileonly-sdk', version: '1.7.0'
         compileOnly group: "org.apache.logging.log4j", name: "log4j-api", version: "$loggerVersion"
 
         implementation name: 'package-runtime-sdk', version: '1.0.0'
 
-        testImplementation name: 'package-compileonly-sdk', version: '1.0.0'
+        testImplementation name: 'package-compileonly-sdk', version: '1.7.0'
         testImplementation group: "org.testng", name: "testng", version: "$testNgVersion"
 
         implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-        implementation 'org.json:json:20230618'
-        implementation 'org.passay:passay:1.6.3'
+        implementation 'org.json:json:20251224'
+        implementation 'org.passay:passay:1.6.6'
     }
 
 }

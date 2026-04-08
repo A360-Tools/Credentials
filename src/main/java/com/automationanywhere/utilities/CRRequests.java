@@ -90,9 +90,13 @@ public final class CRRequests {
         return HTTPRequest.request(updateAttributeValueURI, headers, jsonBody.toString(), HttpMethod.PUT);
     }
 
-    public String getAttributeValue(String credentialID, String credentialAttributeValueId, String UserId) {
-        String updateAttributeValueURI = String.format(CRURL + ATTRIBUTE_VALUES_URI, credentialID) +
-                "?credentialAttributeId=" + credentialAttributeValueId + "&userId=" + UserId;
-        return HTTPRequest.request(updateAttributeValueURI, headers, null, HttpMethod.GET);
+    public String getAttributeValue(String credentialID, String credentialAttributeId, String userId,
+                                     boolean userProvided) {
+        String attributeValueURI = String.format(CRURL + ATTRIBUTE_VALUES_URI, credentialID) +
+                "?credentialAttributeId=" + credentialAttributeId;
+        if (userProvided) {
+            attributeValueURI += "&userId=" + userId;
+        }
+        return HTTPRequest.request(attributeValueURI, headers, null, HttpMethod.GET);
     }
 }
